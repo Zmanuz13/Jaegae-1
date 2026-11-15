@@ -1,11 +1,14 @@
 #Inizio progetti Jaegae (재개),che segnano la ripresa della programmazione,e più precisamente la programmazione con Python
 #A seguito della serie Shibal (시발),i primi progetti sperimentali,e della serie Mirae (미래),la serie di progetti nata con l'intento di iniziare a programmare seriamente,nasce Jaegae (재개)
 #Introduzione a Jaegae (재개):Questa serie di progetti segnà il mio nuovo inizio con la programmazione,dopo circa 2/3 mesi di pausa.
-#Jaegae (재개) V3
+#Jaegae (재개) V4
 #Primo programma ripresa,BAEM(뱀),gioco snake.
 import pygame
 import random as rd
 pygame.init()
+pygame.display.set_caption("Baem")
+icon = pygame.image.load("FJ_snake.jpeg")
+pygame.display.set_icon(icon)
 screen=pygame.display.set_mode((500,500))
 clock = pygame.time.Clock()
 running = True
@@ -15,9 +18,12 @@ baem.y=250
 snake = [baem]
 dx=25
 dy=0
-sagwa=pygame.draw.rect(screen, (157, 255, 20), pygame.Rect(25,25,25,25))
+jogak=0
+sagwa=pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(25,25,25,25))
+sagwa_geum=pygame.draw.rect(screen, (214, 175, 34), pygame.Rect(25,25,25,25))
 game_over=False
 win=False
+geum_cond = False
 score=0
 font = pygame.font.Font(None, 36)
 testo_game_over = font.render("GAME OVER", True, (255, 0, 0))
@@ -31,30 +37,26 @@ def posiziona_sagwa():
             break
     return sagwa
 posiziona_sagwa()
+def posiziona_geum():
+    while True:
+        sagwa_geum.x = rd.randint(0, 19) * 25
+        sagwa_geum.y = rd.randint(0, 19) * 25
+        if not any(sagwa_geum.colliderect(part) for part in snake) and not (sagwa.colliderect(sagwa_geum)) :
+            break
+    return sagwa_geum
 while running:
+    haengdong = False
+    clock.tick(9)
     if score == 399:
         win = True
         game_over = True
+        geum_cond= False
+        jogak=0
     screen.fill((0, 0, 0))
     testo_score = font.render(f"Score: {score}/399", True, (255, 255, 255))
-    if score<5:
-        clock.tick(5)
-    elif 5<=score<25:
-        clock.tick(6)
-    elif 25<=score<75:
-        clock.tick(7)
-    elif 75<=score<175:
-        clock.tick(8)
-    elif 175<=score<225:
-        clock.tick(9)
-    elif 225<=score<300:
-        clock.tick(10)
-    elif 300<=score<349:
-        clock.tick(11)
-    elif 349<=score<=399:
-        clock.tick(12)
-
-    pygame.draw.rect(screen, (255, 0, 0), sagwa)
+    pygame.draw.rect(screen, (255,0,0), sagwa)
+    if geum_cond:
+        pygame.draw.rect(screen, (214, 175, 34), sagwa_geum)
     if game_over and not win:
         screen.blit(testo_game_over, (175, 150))
         screen.blit(testo_restart, (100, 185))
@@ -72,21 +74,28 @@ while running:
             posiziona_sagwa()
             win = False
             game_over = False
+            geum_cond = False
+            jogak=0
         elif not game_over:
 
             if event.type == pygame.KEYDOWN :
-                if event.key == pygame.K_UP and dy!=25 or event.key == pygame.K_w and dy!=25:
+
+                if event.key == pygame.K_UP and dy!=25 and haengdong==False or event.key == pygame.K_w and dy!=25 and haengdong== False:
                     dy = -25
                     dx=0
-                if event.key == pygame.K_DOWN and dy!=-25 or event.key == pygame.K_s and dy!=-25:
+                    haengdong=True
+                if event.key == pygame.K_DOWN and dy!=-25 and haengdong==False or event.key == pygame.K_s and dy!=-25 and haengdong== False:
                     dy = +25
                     dx=0
-                if event.key == pygame.K_LEFT and dx!=25 or event.key == pygame.K_a and dx!=25:
+                    haengdong=True
+                if event.key == pygame.K_LEFT and dx!=25 and haengdong==False or event.key == pygame.K_a and dx!=25 and haengdong== False:
                     dx = -25
                     dy=0
-                if event.key == pygame.K_RIGHT and dx!=-25 or event.key == pygame.K_d and dx!=-25:
+                    haengdong=True
+                if event.key == pygame.K_RIGHT and dx!=-25 and haengdong==False or event.key == pygame.K_d and dx!=-25 and haengdong== False:
                     dx = +25
                     dy=0
+                    haengdong=True
 
     if not game_over:
         sae_meori = snake[0].copy()
@@ -96,10 +105,22 @@ while running:
         if snake[0].colliderect(sagwa):
             sagwa=posiziona_sagwa()
             score+=1
+            rng = rd.randint(0, 9)
+            if rng==0 and geum_cond==False:
+                geum_cond = True
+                posiziona_geum()
+        elif jogak>0:
+            jogak-=1
         else:
             snake.pop()
         if snake[0].x > 475 or snake[0].x < 0 or snake[0].y > 475 or snake[0].y < 0 or snake[0] in snake[1:]:
             game_over = True
+        if snake[0].colliderect(sagwa_geum) and geum_cond:
+            score+=5
+            jogak+=5
+            geum_cond = False
+        if score>399:
+            score=399
 
     for goyangi in snake:
         pygame.draw.rect(screen, (157, 255, 20),goyangi)
