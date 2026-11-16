@@ -29,10 +29,20 @@ font = pygame.font.Font(None, 36)
 testo_game_over = font.render("GAME OVER", True, (255, 0, 0))
 testo_vittoria = font.render("VITTORIA", True, (255, 215, 0))
 testo_restart = font.render("Premi SPAZIO per Rigiocare", True, (255, 255, 255))
-suono_collect=pygame.mixer.Sound('Jak_TPL_Orb_Final.ogg')
-suono_lose1=pygame.mixer.Sound('87-say-good-night-jak.ogg')
-suono_lose2=pygame.mixer.Sound('80-try-again.ogg')
-suono_win=pygame.mixer.Sound('power-cell-victories-fucv5.ogg')
+class SuonoMuto:
+    def play(self):
+        pass
+
+def carica_suono(nome):
+    try:
+        return pygame.mixer.Sound(nome)
+    except (pygame.error, FileNotFoundError):
+        return SuonoMuto()
+
+suono_collect = carica_suono('Jak_TPL_Orb_Final.ogg')
+suono_lose1 = carica_suono('87-say-good-night-jak.ogg')
+suono_lose2 = carica_suono('80-try-again.ogg')
+suono_win = carica_suono('power-cell-victories-fucv5.ogg')
 def posiziona_sagwa():
     while True:
         sagwa.x = rd.randint(0, 19) * 25
