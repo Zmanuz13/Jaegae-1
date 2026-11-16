@@ -1,7 +1,7 @@
 #Inizio progetti Jaegae (재개),che segnano la ripresa della programmazione,e più precisamente la programmazione con Python
 #A seguito della serie Shibal (시발),i primi progetti sperimentali,e della serie Mirae (미래),la serie di progetti nata con l'intento di iniziare a programmare seriamente,nasce Jaegae (재개)
-#Introduzione a Jaegae (재개):Questa serie di progetti segnà il mio nuovo inizio con la programmazione,dopo circa 2/3 mesi di pausa.
-#Jaegae (재개) V4
+#Introduzione a Jaegae (재개):Questa serie di progetti segna il mio nuovo inizio con la programmazione,dopo circa 2/3 mesi di pausa.
+#Jaegae (재개) V4.5
 #Primo programma ripresa,BAEM(뱀),gioco snake.
 import pygame
 import random as rd
@@ -29,6 +29,10 @@ font = pygame.font.Font(None, 36)
 testo_game_over = font.render("GAME OVER", True, (255, 0, 0))
 testo_vittoria = font.render("VITTORIA", True, (255, 215, 0))
 testo_restart = font.render("Premi SPAZIO per Rigiocare", True, (255, 255, 255))
+suono_collect=pygame.mixer.Sound('Jak_TPL_Orb_Final.ogg')
+suono_lose1=pygame.mixer.Sound('87-say-good-night-jak.ogg')
+suono_lose2=pygame.mixer.Sound('80-try-again.ogg')
+suono_win=pygame.mixer.Sound('power-cell-victories-fucv5.ogg')
 def posiziona_sagwa():
     while True:
         sagwa.x = rd.randint(0, 19) * 25
@@ -47,11 +51,12 @@ def posiziona_geum():
 while running:
     haengdong = False
     clock.tick(9)
-    if score == 399:
+    if score == 399 and win==False:
         win = True
         game_over = True
         geum_cond= False
         jogak=0
+        suono_win.play()
     screen.fill((0, 0, 0))
     testo_score = font.render(f"Score: {score}/399", True, (255, 255, 255))
     pygame.draw.rect(screen, (255,0,0), sagwa)
@@ -105,6 +110,7 @@ while running:
         if snake[0].colliderect(sagwa):
             sagwa=posiziona_sagwa()
             score+=1
+            suono_collect.play()
             rng = rd.randint(0, 9)
             if rng==0 and geum_cond==False:
                 geum_cond = True
@@ -115,10 +121,16 @@ while running:
             snake.pop()
         if snake[0].x > 475 or snake[0].x < 0 or snake[0].y > 475 or snake[0].y < 0 or snake[0] in snake[1:]:
             game_over = True
+            lose_sound_cond = rd.randint(0, 1)
+            if lose_sound_cond == 0:
+                suono_lose1.play()
+            else:
+                suono_lose2.play()
         if snake[0].colliderect(sagwa_geum) and geum_cond:
             score+=5
             jogak+=5
             geum_cond = False
+            suono_collect.play()
         if score>399:
             score=399
 
